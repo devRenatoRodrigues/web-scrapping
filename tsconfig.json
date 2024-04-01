@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2016", // ou outra versão do ECMAScript, dependendo da compatibilidade do navegador
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist", // diretório onde os arquivos compilados serão armazenados
+    "rootDir": "./src", // diretório raiz onde seus arquivos TypeScript estão localizados
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "lib": ["esnext", "dom"], // lib para incluir suporte ao navegador DOM
+    "types": ["node", "jest"] // tipos do Node.js
+    
+  },
+  "jest": {
+    "tsConfig": "./tsconfig.json"
+  },
+  "include": ["src/**/*.ts"], // padrão para incluir os arquivos TypeScript que você deseja compilar
+  "exclude": ["node_modules"] // padrão para excluir os arquivos que você não deseja compilar (por exemplo, bibliotecas de terceiros)
+}

@@ -1,0 +1,31 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "standard-with-typescript",
+        "plugin:react/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "indent": ["error", 2], // Indentação de 2 espaços
+        "linebreak-style": ["error", "unix"], // Quebras de linha no estilo Unix
+        "quotes": ["error", "single"], // Aspas simples são necessárias
+        "semi": ["error", "always"], // Sempre requer ponto e vírgula
+        "no-console": "warn", // Avisos para console.log
+        "no-unused-vars": "warn", // Avisos para variáveis não utilizadas
+        "react/prop-types": "off", // Desativa a verificação de propTypes
+        "@typescript-eslint/no-unused-vars": ["warn"], // Avisos para variáveis não utilizadas no TypeScript
+        "@typescript-eslint/explicit-function-return-type": "off", // Desativa a exigência de tipo de retorno explícito para funções no TypeScript
+        "eslint-plugin-promise": "error",
+        "eslint-plugin-import": "error"
+    }
+}
