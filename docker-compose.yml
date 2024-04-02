@@ -1,0 +1,47 @@
+version: '3'
+services:
+  db:
+    image: postgres:alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DATABASE: MyDatabase
+      POSTGRES_USER: MyUser
+      POSTGRES_PASSWORD: MyPassword
+    networks:
+      - my-network
+
+  backend:
+    build: ./src/
+    restart: always
+    volumes:
+      - ./src/server:/app/
+      - ./dist:/app/
+      - ./temp:/app/
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: MyDatabase
+      DB_USER: MyUser
+      DB_PASSWORD: MyPassword
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+
+  # frontend:
+  #   image: your_frontend_image
+  #   restart: always
+  #   volumes:
+  #     - ./src/app:/app
+  #   ports:
+  #     - 3001:3001
+  #   depends_on:
+  #     - backend
