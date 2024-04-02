@@ -1,3 +1,4 @@
+import LinkedInService from "../services/Linkedin.service";
 
 describe('LinkedIn Test', () => {
     jest.setTimeout(300000)
@@ -7,7 +8,8 @@ describe('LinkedIn Test', () => {
     });
 
     it('should login', async () => {
-        //your code here
+        const service = new LinkedInService();
+        await service.findJobs();
     })
 
     afterAll(async () => {
