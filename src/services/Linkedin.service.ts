@@ -1,14 +1,11 @@
 import { WebBrowser } from "../driver";
 import dotenv from 'dotenv';
-import { ILinkedInAuth } from "../interfaces";
-import { Page } from "playwright";
+import { ElementHandle, Page } from "playwright";
+import { LoginUseCase, SearchUseCase, SelectFilterUseCase } from "./LinkedInUseCases";
+import fs from "fs";
+import { ILinkedInJob } from "../interfaces";
+
 dotenv.config();
-
-interface ExtractMethod {
-    page: Page;
-    infos: object;
-
-}
 
 export default class LinkedInService {
     private _driver: WebBrowser;
@@ -18,52 +15,81 @@ export default class LinkedInService {
         this._page = null;
     }
 
-    async findJobs() {
+    async findJobs(quantity: number = 50) {
+        const jobs: ILinkedInJob[] = [];
+        let pageNumber = 1;
+        let pageButtonEl;
         try {
+            const loginUseCase = new LoginUseCase();
+            const searchUseCase = new SearchUseCase();
+            const selectFilterUseCase = new SelectFilterUseCase();
 
             this._page = await this._driver.start();
-            await this._page.goto('https://www.linkedin.com/');
-            const currentUrl = this._page.url()
-            console.log(currentUrl)
-            if (!currentUrl.includes('feed')) {
-                await this._login(this._page);
+            await loginUseCase.execute(this._page);
+            await searchUseCase.execute(this._page, 'Software Engineer');
+            await selectFilterUseCase.execute(this._page, 'Jobs');
+            await this._page.waitForTimeout(10000);
+            while (jobs.length < quantity) {
+                const ulEl = await this._page.$$('.scaffold-layout__list-container');
+                const liEl = await ulEl[0].$$('li.jobs-search-results__list-item');
+                const footerEl = await this._page.$('footer.global-footer-compact');
+                await this._scrollToBottom(liEl, footerEl!);
+                const extract = await this._extractJobs(liEl);
+                jobs.push(...extract!);
+                pageButtonEl = await this._page.$(`button[aria-label="Page ${pageNumber++}"]`);
+                await pageButtonEl?.click();
+
             }
-            await this._search(this._page, 'Software Engineer');
-            await this._selectFilter(this._page, 'Jobs')
+            this._saveOn(jobs);
 
         } catch (error: any) {
             throw new Error(`Error on Find Jobs: ${error.message}`);
 
         } finally {
-            // if (this._driver) {
-            //     await new CloseUseCase(this._driver).execute()
-            // }
-            console.log('finally')
+            this._console('Closing Browser...')
+            // await this._driver.close();
+
         }
     }
 
-    private async _login(page: Page) {
-        const auth: ILinkedInAuth = {
-            user: process.env.LINKEDIN_USER || '',
-            password: process.env.LINKEDIN_PASSWORD || ''
+
+    private async _extractJobs(liEl: ElementHandle[]) {
+        this._console('Extracting Jobs...')
+        let jobs: ILinkedInJob[] = []
+        try {
+            const baseUrl = 'https://www.linkedin.com';
+            for (const el of liEl) {
+                const nameLinkElement = await el.$('a.job-card-list__title');
+                const job = (await nameLinkElement?.innerText())?.trim() || '';
+                const url = baseUrl + await nameLinkElement?.getAttribute('href');
+                const createdAt = new Date().toISOString();
+                const currentJob: ILinkedInJob = { job, url, createdAt };
+                jobs.push(currentJob);
+            }
+            this._console(`Total Jobs extract: ${jobs.length} - ${jobs[24].job}`);
+            return jobs;
+        } catch (error) {
+            console.log('error', error)
         }
-        await page.goto('https://www.linkedin.com/login');
-        await page.waitForSelector('input#username');
-        await page.fill('input#username', auth.user);
-        await page.fill('input#password', auth.password);
-        await page.click('button[type="submit"]');
     }
 
-    private async _search(page: Page, search: string) {
-        await page.waitForSelector('input[aria-label="Search"]');
-        await page.fill('input[aria-label="Search"]', search);
-        await page.keyboard.press('Enter');
+    private async _scrollToBottom(elements: ElementHandle[], footerSelector: ElementHandle) {
+        this._console('Scrolling to Bottom...')
+        for (let i = 0; i < elements.length; i += 7) {
+            await elements[i].scrollIntoViewIfNeeded();
+            await this._page!.waitForTimeout(3000);
+        }
     }
 
-    private async _selectFilter(page: Page, filter: string) {
-        await page.click(`button:has-text("${filter}")`)
+    private _saveOn(jobs: ILinkedInJob[]) {
+        fs.writeFileSync('temp/jobs.json', JSON.stringify(jobs, null, 2));
     }
 
-    private async _extract(page: Page, { }: Object)
+
+    private _console(message: string) {
+        if (process.env.DEBUG === 'true') {
+            console.log(message);
+        }
+    }
 
 }
