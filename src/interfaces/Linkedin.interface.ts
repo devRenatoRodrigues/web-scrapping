@@ -6,5 +6,5 @@ export interface ILinkedInAuth {
 export interface ILinkedInJob {
     job: string;
     url: string;
-    createdAt: string;
+    createdAt: Date;
 }

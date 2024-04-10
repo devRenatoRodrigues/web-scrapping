@@ -30,17 +30,20 @@ export default class LinkedInService {
             await selectFilterUseCase.execute(this._page, 'Jobs');
             await this._page.waitForTimeout(10000);
             while (jobs.length < quantity) {
+                const nextPage = pageNumber + 1;
                 const ulEl = await this._page.$$('.scaffold-layout__list-container');
                 const liEl = await ulEl[0].$$('li.jobs-search-results__list-item');
                 const footerEl = await this._page.$('footer.global-footer-compact');
                 await this._scrollToBottom(liEl, footerEl!);
                 const extract = await this._extractJobs(liEl);
+                console.log(extract)
                 jobs.push(...extract!);
-                pageButtonEl = await this._page.$(`button[aria-label="Page ${pageNumber++}"]`);
+                pageButtonEl = await this._page.$(`button[aria-label="Page ${nextPage}"]`);
                 await pageButtonEl?.click();
+                await this._page.waitForTimeout(5000);
 
             }
-            this._saveOn(jobs);
+            return jobs;
 
         } catch (error: any) {
             throw new Error(`Error on Find Jobs: ${error.message}`);
@@ -62,7 +65,7 @@ export default class LinkedInService {
                 const nameLinkElement = await el.$('a.job-card-list__title');
                 const job = (await nameLinkElement?.innerText())?.trim() || '';
                 const url = baseUrl + await nameLinkElement?.getAttribute('href');
-                const createdAt = new Date().toISOString();
+                const createdAt = new Date();
                 const currentJob: ILinkedInJob = { job, url, createdAt };
                 jobs.push(currentJob);
             }
@@ -75,10 +78,11 @@ export default class LinkedInService {
 
     private async _scrollToBottom(elements: ElementHandle[], footerSelector: ElementHandle) {
         this._console('Scrolling to Bottom...')
-        for (let i = 0; i < elements.length; i += 7) {
+        for (let i = 0; i < elements.length; i += 5) {
             await elements[i].scrollIntoViewIfNeeded();
             await this._page!.waitForTimeout(3000);
         }
+        footerSelector.scrollIntoViewIfNeeded();
     }
 
     private _saveOn(jobs: ILinkedInJob[]) {

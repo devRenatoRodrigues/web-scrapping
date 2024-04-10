@@ -12,25 +12,32 @@ export class WebBrowser {
 
     async start(): Promise<Page> {
         try {
-            const profileDirectory = './temp/chrome-profile';
-            const storageStatePath = path.join(profileDirectory, 'storage.json');
+            const profileDirectory = '';
+            // const storageStatePath = path.join(profileDirectory, 'storage.json');
 
-            if (!fs.existsSync(profileDirectory)) {
-                fs.mkdirSync(profileDirectory, { recursive: true });
-            }
+            // const dir = path.dirname(storageStatePath);
 
-            // Verifica se o arquivo de estado de armazenamento existe, se não, cria o arquivo
-            if (!fs.existsSync(storageStatePath)) {
-                fs.writeFileSync(storageStatePath, '{}');
-            }
+            // if (!fs.existsSync(dir)) {
+            //     fs.mkdirSync(dir, { recursive: true });
+            // }
 
-            this.browser = await chromium.launchPersistentContext(storageStatePath, {
-                headless: false,
+
+            // if (!fs.existsSync(profileDirectory)) {
+            //     fs.mkdirSync(profileDirectory, { recursive: true });
+            // }
+
+            // // Verifica se o arquivo de estado de armazenamento existe, se não, cria o arquivo
+            // if (!fs.existsSync(storageStatePath)) {
+            //     fs.writeFileSync(storageStatePath, '{}');
+            // }
+
+            this.browser = await chromium.launchPersistentContext(profileDirectory, {
+                headless: true,
                 args: [
                     '--disable-gpu',
                     '--no-sandbox',
                 ],
-                viewport: { width: 1500, height: 986 }
+                viewport: { width: 1366, height: 768 }
             });
 
             console.log('Browser started...');

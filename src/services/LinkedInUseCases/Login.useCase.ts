@@ -14,7 +14,7 @@ export class LoginUseCase {
     async execute(page: Page) {
         this._console('Starting Login...')
         try {
-            await page.goto('https://www.linkedin.com/');
+            await page.goto('https://www.linkedin.com/login');
             if (page.url().includes('feed')) {
                 this._console('Already Logged In...')
                 return;
