@@ -12,6 +12,12 @@ describe('LinkedIn Test', () => {
         await service.findJobs();
     })
 
+    it('Connect to people', async () => {
+        const service = new LinkedInService();
+        await service.connectPeople();
+    })
+
+
     afterAll(async () => {
         //you code here
     });

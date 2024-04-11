@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts",
-    "test": "jest"
+    "dev": "npm run generate && nodemon src/server.ts",
+    "test": "jest",
+    "generate": "npx prisma generate --schema=./src/prisma/schema.prisma"
   },
   "keywords": [],
   "author": "",

@@ -4,19 +4,26 @@ WORKDIR /app
 
 COPY ./package*.json ./
 
+# RUN apt-get update && apt-get install -y \
+#     xvfb \
+#     x11-utils \
+#     x11vnc \
+#     xfonts-100dpi \
+#     xfonts-75dpi \
+#     xfonts-scalable \
+#     xfonts-cyrillic \
+#     fluxbox \
+#     openbox \
+#     && rm -rf /var/lib/apt/lists/*
+
 RUN npm install
 
 RUN npm install -g prisma
 
-
 COPY . .
-
-RUN prisma generate --schema=./src/prisma/schema.prisma
-# RUN prisma migrate dev --name init --schema=./src/prisma/schema.prisma
-# RUN npx -y playwright@1.43.0 install --with-deps
-RUN npm i chromium
 
 EXPOSE 3000
 
 
-CMD ["npm", "run", "dev"]
+# CMD [ "xvfb-run","npm", "run", "dev"]
+CMD [,"npm", "run", "dev"]

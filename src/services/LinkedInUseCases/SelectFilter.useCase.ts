@@ -2,7 +2,7 @@ import { Page } from "playwright";
 
 export class SelectFilterUseCase {
     async execute(page: Page, filter: string) {
-        this._console('Selecting Filter...')
+        this._console(`Selecting ${filter} filter...`)
         try {
             await page.click(`button:has-text("${filter}")`)
         } catch (error: any) {

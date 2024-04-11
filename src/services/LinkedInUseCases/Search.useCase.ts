@@ -2,7 +2,7 @@ import { Page } from "playwright";
 
 export class SearchUseCase {
     async execute(page: Page, search: string) {
-        this._console('Searching Jobs...')
+        this._console('Searching...')
         try {
             await page.waitForSelector('input[aria-label="Search"]');
             await page.fill('input[aria-label="Search"]', search);
