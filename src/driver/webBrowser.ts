@@ -15,6 +15,13 @@ export class WebBrowser {
             const profileDirectory = './temp/chrome-profile';
             const storageStatePath = path.join(profileDirectory, 'storage.json');
 
+            const dir = path.dirname(storageStatePath);
+
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+
+
             if (!fs.existsSync(profileDirectory)) {
                 fs.mkdirSync(profileDirectory, { recursive: true });
             }
@@ -24,13 +31,13 @@ export class WebBrowser {
                 fs.writeFileSync(storageStatePath, '{}');
             }
 
-            this.browser = await chromium.launchPersistentContext(storageStatePath, {
+            this.browser = await chromium.launchPersistentContext(profileDirectory, {
                 headless: false,
                 args: [
                     '--disable-gpu',
                     '--no-sandbox',
                 ],
-                viewport: { width: 1500, height: 986 }
+                viewport: { width: 1366, height: 768 }
             });
 
             console.log('Browser started...');
